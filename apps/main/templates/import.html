@@ -195,12 +195,12 @@
                    error: function(data){
                        var obj=JSON.parse('[' + data + ']');
 //                       console.log(obj[0].msg)
-                       tab.rows[j].cells[15].innerHTML = obj[0].msg;
+                       tab.rows[j].cells[16].innerHTML = obj[0].msg;
                    },
                    success: function (data) {
                        var obj=JSON.parse('[' + data + ']');
 //                       console.log(obj[0].msg)
-                       tab.rows[j].cells[15].innerHTML = obj[0].msg;
+                       tab.rows[j].cells[16].innerHTML = obj[0].msg;
                    }
                });
            }
