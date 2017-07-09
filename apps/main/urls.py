@@ -4,6 +4,7 @@ from .views import HomeView
 from .views import ConfigView
 from .views import ImportView
 from .views import consSQL
+from .views import TestSQL
 from .views import guardarMongoAjax
 
 
@@ -13,7 +14,6 @@ urlpatterns = [
     url(r'^configuracion/$', ConfigView.as_view(), name="config"),
     url(r'^importacion/$', ImportView.as_view(), name="import"),
     url(r'^consSQL/$',consSQL),
+
     url(r'^guardarMongo/$',guardarMongoAjax),
-
-
 ]
