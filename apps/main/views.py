@@ -26,6 +26,8 @@ class HomeView(TemplateView):
 class ConfigView(TemplateView):
     template_name='config.html'
     def post(self,request,*args,**kwargs):
+     if 'btnGuardar' in request.POST:
+        print("presiono guardar")
         try:
             obj=Configuracion.objects.get(0)
             obj.samiServer=  request.POST['samiServer']
@@ -44,6 +46,19 @@ class ConfigView(TemplateView):
 
         obj.save()
         return HttpResponseRedirect(reverse( 'main:home', **kwargs))
+     else:
+      msg =  TestSQL(request)
+     #context['respuesta']= {'msg': msg }
+     context={}
+     #response= JsonResponse({'msg': msg })
+     context['configuracion'] = {"samiServer":request.POST['samiServer'],
+                                 "usuarioSQL":request.POST['usuarioSQL'],
+                                 "passSQL":request.POST['passSQL'],
+                                 "Transacciones":request.POST['Transacciones'],
+                                 "baseDatosSQL":request.POST['baseDatosSQL']}
+     context['test']={'msg': msg }
+     return render(request,'config.html', context)
+
 
     def get_context_data(self,**kwargs):
         context=super(ConfigView,self).get_context_data(**kwargs)
@@ -52,6 +67,38 @@ class ConfigView(TemplateView):
         except:
             context['configuracion']=''
         return context
+
+#subrutina pra probar los datos del servidor de SQL y verificar su conexion
+def TestSQL(request):
+        print("estoy en Test")
+        msg=''
+        server=   request.POST['samiServer']
+        username=   request.POST['usuarioSQL']
+        password=   request.POST['passSQL']
+        trans=   request.POST['Transacciones']
+        database=   request.POST['baseDatosSQL']
+        driver= '{ODBC Driver 13 for SQL Server}'
+        if len(server) != 0 and len(username) !=0 and len(password) !=0 and len(database) != 0:
+            try:
+                cnxn = pyodbc.connect('DRIVER='+driver+';PORT=1433;SERVER='+server+';PORT=1443;DATABASE='+database+';UID='+username+';PWD='+ password)
+                cursor = cnxn.cursor()
+                msg=  'Conexion a base de datos realizada con exito'
+                #ahorabamos a probar si exsite el  codigo de transacciones
+                sql ="Select top 1 GNC.CodTrans from GNComprobante GNC  "  \
+                     "where GNC.Estado <> 3 and  CodTrans = '" +  trans +  "'"
+                print(sql)
+                cursor.execute(sql)
+                datos = dictfetchall(cursor)
+                if bool(datos) :
+                    msg = msg + ' se han encontrado transacciones'
+                else:
+                    msg = msg + ' No se han encontrado transacciones revise el codigo'
+            except Exception as e:
+                msg=  'error en conexion: ' + str(e)
+        else :
+            msg='Debe ingresar la informacion de la base de datos para poder probar su conexion!!'
+
+        return msg
 
 
 def consFecha(self,bandMax):
@@ -104,6 +151,7 @@ class ImportView(TemplateView):
 
         context['errors'] = errors
         return context
+
 
 
 def consSQL(request):
@@ -167,6 +215,7 @@ def consSQL(request):
 
         context['configuracion_mongo']= {"numMongo": Ventas.objects.count, "maxDate": consFecha(request,1), "minDate": consFecha(request,0)}
     except Exception as e:
+        context['configuracion_mongo']= {"numMongo": 0, "maxDate": 0, "minDate": 0}
         errors.append('base de ventas vacia')
         errors.append(str(e))
     return render(request,'import.html',{'datos':context['datos'],'condicion':context['condicion'],'configuracion_sql':context['configuracion_sql'],
@@ -207,7 +256,7 @@ def guardarMongoAjax(request):
                           PCGrupo1 =  request.GET['CodGrupo1'],
                           PCGrupo2 =  request.GET['CodGrupo2'],
                           PCGrupo3 =  request.GET['CodGrupo3'],
-                          Total =  request.GET['Total'],
+                          Total =  price_convert(request.GET['Total']),
                           )
                 obj.save()
                 #print ("TODO OK")
@@ -222,3 +271,7 @@ def guardarMongoAjax(request):
     else:
         #print ("no entro en ajax")
         return redirect('/')
+
+def price_convert(_price):
+    import re
+    return float(re.sub(r'[^0-9.]', '', _price))

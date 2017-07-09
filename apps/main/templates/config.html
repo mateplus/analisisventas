@@ -9,8 +9,9 @@
   <div class="py-5 bg-faded">
     <div class="container">
       <div class="row">
-        <div class="col-md-12">
-          <form class="form-horizontal py-0 mx-auto" method="post">
+        <form class="form-horizontal py-0 mx-auto" method="post">
+        <div class="col-md-9">
+
             {% csrf_token %}
             <fieldset>
               <!-- Form Name -->
@@ -22,7 +23,7 @@
                 <div class="form-control">
                     <input id="idsamiServer" name="samiServer" placeholder="Nombre servidor sql server" class="form-control input-md" required="" type="text" value="{{ configuracion.samiServer }}" >
 
-                    <span class="help-block">ejemplo: server\sqlexpress</span> </div>
+                    <span class="help-block">ejemplo: server\sqlexpress,  o direccion ip 192.168.1.10 </span> </div>
                 <!-- Text input-->
                 <div class="form-group">
                     <label for="SQLuser">Usuario SQL</label>
@@ -40,11 +41,21 @@
                       <input id="base" name="baseDatosSQL" placeholder="Base de datos" class="form-control input-md" type="text" value="{{  configuracion.baseDatosSQL }}" >
                 </div>
                 <!-- Button -->
-                <div class="form-group"> <button id="btnGuardar" name="btnGuardar" class="btn btn-primary text-warning">Guardar</button> </div>
+                <div class="form-group">
+                    <button type="submit" id="btnGuardar" value = "Guardar" name="btnGuardar" class="btn btn-primary text-warning">Guardar</button>
+                </div>
               </div>
             </fieldset>
-          </form>
+
         </div>
+          <div class="col-md-3">
+            <p>Probar conexion a SQL server </p>
+            {% csrf_token %}
+            <button type="submit" id="btnTest" value="Test" name = "btnTest" class="btn btn-primary text-warning">Test</button>
+            <p> Resultado de la consulta : {{ test.msg }} </p>
+         </div>
+
+        </form>
       </div>
     </div>
   </div>
