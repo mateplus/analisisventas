@@ -1,0 +1,11 @@
+appdirs==1.4.3
+Django==1.9.6
+djangotoolbox==1.8.0
+mongoengine==0.10.0
+packaging==16.8
+pymongo==2.8.1
+pyodbc==4.0.16
+pyparsing==2.2.0
+pytz==2017.2
+six==1.10.0
+Unipath==1.1
