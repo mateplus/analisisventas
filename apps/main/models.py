@@ -10,6 +10,8 @@ class Configuracion(Document):
     passSQL= StringField(max_length=120)
     Transacciones= StringField(max_length=120)
     baseDatosSQL= StringField(max_length=120)
+    IdentificadorTrans = IntField()
+    #1 es numtrans  2 es numdocref
 
     def __unicode__(self):
             return self.samiServer
@@ -33,6 +35,8 @@ class Ventas(Document):
     FechaTrans = DateTimeField()
     CodTrans = StringField(max_length=10)
     NumTrans = IntField()
+    NumDocRef = StringField(max_length=20)
+
     BaseOrigen=StringField(max_length=20)
     Vendedor=StringField(max_length=120)
     NombreCliente= StringField(max_length=150)

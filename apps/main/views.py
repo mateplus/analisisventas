@@ -35,6 +35,7 @@ class ConfigView(TemplateView):
             obj.passSQL = request.POST['passSQL']
             obj.Transacciones = request.POST['Transacciones']
             obj.baseDatosSQL = request.POST['baseDatosSQL']
+            obj.IdentificadorTrans= request.POST['IdentificadorTrans']
 
         except:
             obj=Configuracion(samiServer=request.POST['samiServer'],
@@ -42,6 +43,7 @@ class ConfigView(TemplateView):
                               passSQL= request.POST['passSQL'],
                               Transacciones= request.POST['Transacciones'],
                               baseDatosSQL=request.POST['baseDatosSQL'],
+                              IdentificadorTrans=request.POST['IdentificadorTrans'],
                               )
 
         obj.save()
@@ -55,7 +57,8 @@ class ConfigView(TemplateView):
                                  "usuarioSQL":request.POST['usuarioSQL'],
                                  "passSQL":request.POST['passSQL'],
                                  "Transacciones":request.POST['Transacciones'],
-                                 "baseDatosSQL":request.POST['baseDatosSQL']}
+                                 "baseDatosSQL":request.POST['baseDatosSQL'],
+                                 "IdentificadorTrans":request.POST['IdentificadorTrans']}
      context['test']={'msg': msg }
      return render(request,'config.html', context)
 
@@ -127,16 +130,6 @@ class ImportView(TemplateView):
             context['condicion']={'fdesde':time.strftime("%d/%m/%Y"),'fhasta': time.strftime("%d/%m/%Y") }
         try:
             obj=Configuracion.objects.get(0)
-            #  este modo es solo para bese relacionales max= Ventas.objects.filter().aggregate(Max('FechaTrans'))
-            #pipeline=[ {"$group":{ "_id":"", "maxfecha":{"$max":"$FechaTrans"}} } ]
-            #max= Ventas.objects.aggregate(*pipeline )
-            #resultmax=list(max)
-
-            #pipeline=[ {"$group":{ "_id":"", "minfecha":{"$min":"$FechaTrans"}} } ]
-            #max= Ventas.objects.aggregate(*pipeline )
-            #resultmin=list(max)
-
-            #Ventas.objects.count
 
             context['configuracion_sql'] = {"server":obj.samiServer,"database":obj.baseDatosSQL, "username":obj.usuarioSQL,"transacciones":obj.Transacciones}
 
@@ -180,7 +173,7 @@ def consSQL(request):
                 #cursor.execute("select CodTrans,NumTrans,Nombre,FechaTrans from GNComprobante where FechaTrans between  '" + fdesde
                 #               + "' and  '" + fhasta + "' and  CodTrans = '" +  obj.Transacciones +  "'" )
                 try:
-                    sql ="Select GNC.CodTrans, GNC.NumTrans, GNC.FechaTrans, FCVendedor.CodVendedor as vendedor, \
+                    sql ="Select GNC.CodTrans, GNC.NumTrans,GNC.NumDocRef, GNC.FechaTrans, FCVendedor.CodVendedor as vendedor, \
                     PCProvCli.RUC, PCProvCli.Nombre,PCProvCli.Direccion1,PCProvCli.Telefono1, PCProvCli.Pais, \
                     PCProvCli.Ciudad,PCProvCli.Provincia,PCGrupo1.CodGrupo1, PCGrupo2.CodGrupo2 ,PCGrupo3.CodGrupo3, \
                     sum( IVKArdex.PrecioRealTotal) *-1 as Total \
@@ -190,7 +183,7 @@ def consSQL(request):
                     inner join IVKardex on GNC.TransID = IVKardex.TransID \
                     where GNC.Estado <> 3 AND FechaTrans between  '" + fdesde + " \
                     ' and  '" + fhasta + "' and  CodTrans = '" +  obj.Transacciones +  "' \
-                    group by GNC.codtrans, GNC.numtrans, GNC.FechaTrans, FCVendedor.CodVendedor, \
+                    group by GNC.codtrans, GNC.numtrans, GNC.NumDocRef, GNC.FechaTrans, FCVendedor.CodVendedor, \
                     PCProvCli.RUC, PCProvCli.Nombre,PCProvCli.Direccion1,PCProvCli.Telefono1, PCProvCli.Pais, \
                     PCProvCli.Ciudad,PCProvCli.Provincia,PCGrupo1.CodGrupo1, PCGrupo2.CodGrupo2 ,PCGrupo3.CodGrupo3"
                     #print(sql) ok
@@ -200,6 +193,7 @@ def consSQL(request):
                     #print("datos: " + str(len(context['datos'])))
 
                 except Exception as e:
+                    context['datos'] =''
                     errors.append('error en consulta')
                     errors.append(str(e))
         else:
@@ -238,13 +232,17 @@ def guardarMongoAjax(request):
         #print("Llega al ajax")
         try:
             #priemro consulta si no estan ya guardados los datos
-            res = Ventas.objects(Q(CodTrans =request.GET['CodTrans']) and Q(NumTrans= request.GET['NumTrans']) )
-
+            obj=Configuracion.objects.get(0)
+            if obj.IdentificadorTrans==1:
+                res = Ventas.objects(Q(CodTrans =request.GET['CodTrans']) and Q(NumTrans= request.GET['NumTrans']) )
+            else:
+                res = Ventas.objects(Q(CodTrans =request.GET['CodTrans']) and Q(NumDocRef= request.GET['NumDocRef']) )
             if res:
                 response= JsonResponse({'msg': "La transaccion ya existe" })
             else:
                 obj=Ventas.objects.create(CodTrans=request.GET['CodTrans'],
                           NumTrans= request.GET['NumTrans'],
+                          NumDocRef= request.GET['NumDocRef'],
                           FechaTrans =   datetime.strptime(request.GET['FechaTrans'] +' 0:00' , '%d/%m/%Y  %H:%M'),
                           Vendedor =  request.GET['Vendedor'],
                           NombreCliente =  request.GET['Nombre'],
