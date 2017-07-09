@@ -70,7 +70,7 @@ class ConfigView(TemplateView):
 
 #subrutina pra probar los datos del servidor de SQL y verificar su conexion
 def TestSQL(request):
-        print("estoy en Test")
+        #print("estoy en Test")
         msg=''
         server=   request.POST['samiServer']
         username=   request.POST['usuarioSQL']
@@ -86,7 +86,7 @@ def TestSQL(request):
                 #ahorabamos a probar si exsite el  codigo de transacciones
                 sql ="Select top 1 GNC.CodTrans from GNComprobante GNC  "  \
                      "where GNC.Estado <> 3 and  CodTrans = '" +  trans +  "'"
-                print(sql)
+                #print(sql)
                 cursor.execute(sql)
                 datos = dictfetchall(cursor)
                 if bool(datos) :
