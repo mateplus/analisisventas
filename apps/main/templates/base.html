@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	
+<head>
+  {% load static from staticfiles %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+	{% block styles %}
+
+	{% endblock styles %}
+
+  	<link rel="stylesheet" href="{% static 'css/font-awesome.min.css'%}">
+	<link rel="stylesheet" href="{% static 'css/sami9.css'%}">
+	<title>
+	{% block title %}
+	 
+	{% endblock title %}
+	</title>
+
+
+  
+</head>
+
+<header>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4"> <img src="{%  static 'img/Sami9.png' %}" alt="SAMI 9"> </div>
+        <div class="col-md-8">
+          <ul class="nav nav-pills flex-column">
+            <li class="nav-item text-warning"> <a href="{% url 'main:home' %}" class="nav-link">Home</a> </li>
+            <li class="nav-item"> <a href="{% url 'main:config' %}" class="nav-link">Configuracion</a> </li>
+            <li class="nav-item"> <a href="{% url 'main:import' %}" class="nav-link">Importar Datos</a> </li>
+            <li class="nav-item"> <a href="#" class="nav-link">Entrenamiento</a> </li>
+            <li class="nav-item"> <a href="{% url 'visualizar:ventas' %}" class="nav-link">Visualizar</a> </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+{% block header %}
+
+{% endblock header%}
+
+</header>
+<body{% block onload %}        {% endblock onload%}>
+
+
+    {% block script %}
+
+	{% endblock script %}
+    <script src="{% static 'js/jquery-3.1.1.slim.min.js' %} "></script>
+    {% block content %}
+		    
+	{% endblock content %}
+
+
+	<script src="{% static 'js/tether.min.js' %} "></script>
+	<script src="{% static 'js/bootstrap-4.0.0-alpha.6.min.js' %} "></script>
+  
+</body>
+
+</html>

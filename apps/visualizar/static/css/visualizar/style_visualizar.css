@@ -1,0 +1,46 @@
+svg {
+    border: 1px solid #000000;
+}
+
+text{
+	fill: gray;
+	font-size:8px;
+	font-family:Helvetica;
+	text-anchor:end;
+}
+
+.titulo-eje{
+	fill: black;
+	font-size:10px;
+	font-family:Helvetica;
+}
+
+.titulo-chart{
+	fill: black;
+	font-size:12px;
+	font-family:Helvetica;
+    text-anchor:middle;
+}
+
+.linea{
+		stroke:YellowGreen;
+		stroke-width:2;
+		fill:none;
+}
+.area{
+	fill:blue;
+}
+
+.tooltip {
+        font-family: Arial, helvetica, sans-serif;
+        font-size: 10px;
+        padding: 8px;
+        background: rgba(0, 0, 0, 0.7);
+        border: 1px solid #FFFFFF;
+        box-shadow: rgba(0, 0, 0, 0.5) 1px 1px 4px;
+        color: #FFFFFF;
+        border-radius: 4px;
+}
+
+
+

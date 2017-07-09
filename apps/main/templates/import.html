@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+
+{% block title %}
+  Importar Datos
+{% endblock title %}
+
+{% block script %}
+    <script type="text/javascript"  src="{% static 'js/jquery.min.js' %} "></script>
+{% endblock script  %}
+
+{% block content %}
+    {{ block.super }}
+
+
+  <div class="py-5 bg-faded">
+    <div class="container ">
+      <div class="row">
+         <div class="col-md-6">
+            <div class="form-group">
+            <img class="img-responsive imageClip"  src="{%  static 'img/importacion.png' %}" alt="Importacion">
+            <p>IMPORTACION DE DATOS</p>
+            <p>Mediante esta pantalla, se hara una consulta en la base de datos del programa SAMI de acuerdo a un rango de fechas y el resultado
+               de esta consulta sera grabado en  la base de datos MONGODB para realizar el analisis de informacion</p>
+
+
+            </div>
+
+         </div>
+         <div class="col-md-6">
+            <div class="form-group">
+                <table class="table">
+                    <tbody>
+                      <tr>
+                        <td>Servidor Sami:</td>
+                        <td>{{  configuracion_sql.server  }} </td>
+                      </tr>
+                      <tr>
+                        <td>Base Datos Sami:</td>
+                        <td>{{  configuracion_sql.database  }} </td>
+                      </tr>
+
+                      <tr>
+                        <td>Usuario Base de datos:</td>
+                        <td>{{  configuracion_sql.username  }} </td>
+                      </tr>
+
+                      <tr>
+                        <td>Transacciones:</td>
+                        <td>{{  configuracion_sql.transacciones  }} </td>
+                      </tr>
+
+                      <tr>
+                        <td>Cantidad informacion MongoDB:</td>
+                        <td>{{ configuracion_mongo.numMongo }}</td>
+                      </tr>
+                      <tr>
+                        <td>Fecha Minima MongoDB:</td>
+                        <td>{{ configuracion_mongo.minDate }}</td>
+                      </tr>
+                      <tr>
+                        <td>Fecha Maxima MongoDB:</td>
+                        <td>{{ configuracion_mongo.maxDate }}</td>
+                      </tr>
+                    </tbody>
+                </table>
+            </div>
+         </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+            {% if errors  %}
+                <ul>
+                    {% for error in errors %}
+                        <li style="color:red;">{{ error }}</li>
+                    {% endfor %}
+                 </ul>
+            {% endif %}
+          <form class="form-inline text-warning"  action="/consSQL/" method="get" >
+            {% csrf_token %}
+              <div class="form-group"> <label for="fdesde">Fecha Desde:</label>
+                  <input type="date" id="fdesde" name="fdesde" placeholder="01/01/2010" class="form-control input-md"  value={{  condicion.fdesde }}>
+
+
+              </div>
+              <div class="form-group"> <label for="fhasta">Fecha Hasta:</label>
+                  <input type ="date" id="fhasta" name="fhasta" placeholder="12/31/2017" class="form-control input-md" value={{ condicion.fhasta }}  >
+              </div>
+              <button type="submit" class="btn btn-primary text-warning">Buscar</button>
+              <p> Resultado de la consulta : {{ condicion.numresultado }} registros  </p>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="py-5">
+    <div class="container">
+      <div class="row">
+        {% if not errors  %}
+<!--              <a href='/importar/' class =="nav-link">IMPORTAR DATOS</a> -->
+            <input type="button"  onclick="exportar()" value="Grabar Datos" class="btn btn-primary text-warning">
+
+        {% endif %}
+        <div class="col-md-12">
+          <table class="table" id="DataTableId">
+            <thead>
+              <tr>
+                <th>codTrans</th>
+                <th>NumTrans</th>
+                <th>Fecha</th>
+                <th>Vendedor</th>
+                <th>RUC</th>
+                <th>Nombre</th>
+                <th>Direccion</th>
+                <th>Telefono</th>
+                <th style="display:none;">Pais</th>
+                <th style="display:none;">Ciudad</th>
+                <th style="display:none;">Provincia</th>
+                <th style="display:none;">CodGrupo1</th>
+                <th style="display:none;">CodGrupo2</th>
+                <th style="display:none;">CodGrupo3</th>
+                <th>Total</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% load humanize %}
+             {%  for dato in datos %}
+              <tr>
+
+                <td>{{ dato.CodTrans }} </td>
+                <td>{{ dato.NumTrans }} </td>
+                <td>{{ dato.FechaTrans|date:'d/m/Y' }} </td>
+                <td>{{ dato.Vendedor }} </td>
+                <td>{{ dato.RUC }} </td>
+                <td>{{ dato.Nombre }} </td>
+                <td>{{ dato.Direccion1 }} </td>
+                <td>{{ dato.Telefono1 }} </td>
+                <td style="display:none;">{{ dato.Pais }} </td>
+                <td style="display:none;">{{ dato.Ciudad }} </td>
+                <td style="display:none;">{{ dato.Provincia }} </td>
+                <td style="display:none;">{{ dato.CodGrupo1 }} </td>
+                <td style="display:none;">{{ dato.CodGrupo2 }} </td>
+                <td style="display:none;">{{ dato.CodGrupo3 }} </td>
+                <td>{{ dato.Total|floatformat:2|intcomma }} </td>
+                <td></td>
+
+               </tr>
+             {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!--Java Script para leer la tabla-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>-->
+
+    <script type="text/javascript"  src="{% static 'js/jquery.min.js' %} "></script>
+
+
+    <script>
+
+        $(document).ajaxStart(
+                function() {
+                    $(document.body).css({'cursor' : 'wait'});
+                        }).ajaxStop(function() {
+                $(document.body).css({'cursor' : 'default'});
+        });
+
+       function exportar(){
+           var tab = document.getElementById('DataTableId'); // id of table
+           var filas = tab.rows.length;
+           //console.log ('estoy en exportar')
+           //barrido de toda la tabla
+           //console.log('estamos en la subrutia exportar');
+           for (j = 1 ; j < filas; j++) {
+               //console.log ('CodTrans' + tab.rows[j].cells[0].innerHTML + 'NumTrans'+ tab.rows[j].cells[1].innerHTML);
+
+               $.ajax({
+                   data: {'CodTrans': tab.rows[j].cells[0].innerHTML,'NumTrans':tab.rows[j].cells[1].innerHTML,
+                          'FechaTrans': tab.rows[j].cells[2].innerHTML,'Vendedor': tab.rows[j].cells[3].innerHTML,
+                          'RUC':tab.rows[j].cells[4].innerHTML,'Nombre':tab.rows[j].cells[5].innerHTML,
+                          'Direccion':tab.rows[j].cells[6].innerHTML, 'Telefono':tab.rows[j].cells[7].innerHTML,
+                          'Pais':tab.rows[j].cells[8].innerHTML, 'Ciudad':tab.rows[j].cells[9].innerHTML,
+                          'Provincia':tab.rows[j].cells[10].innerHTML,
+                          'CodGrupo1':tab.rows[j].cells[11].innerHTML, 'CodGrupo2':tab.rows[j].cells[12].innerHTML,
+                          'CodGrupo3':tab.rows[j].cells[13].innerHTML, 'Total':tab.rows[j].cells[14].innerHTML
+                   },
+                   url: '/guardarMongo/',
+                   type: 'GET',
+                   async: false,
+                   error: function(data){
+                       var obj=JSON.parse('[' + data + ']');
+//                       console.log(obj[0].msg)
+                       tab.rows[j].cells[15].innerHTML = obj[0].msg;
+                   },
+                   success: function (data) {
+                       var obj=JSON.parse('[' + data + ']');
+//                       console.log(obj[0].msg)
+                       tab.rows[j].cells[15].innerHTML = obj[0].msg;
+                   }
+               });
+           }
+       }
+
+    </script>
+
+
+{% endblock content %}
+
+

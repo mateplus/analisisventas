@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% block title %}
+  Visualizacion
+{% endblock title %}
+
+{% block styles %}
+  	<link rel="stylesheet" href="{% static 'css/visualizar/style_visualizar.css'%}">
+{% endblock styles %}
+
+
+
+{% block script %}
+	    <script language="javascript" type="text/javascript"  src="{% static 'js/visualizar/d3.js' %} "></script>
+	    <script language="javascript" type="text/javascript"  src="{% static 'js/visualizar/d3-tip.js' %} "></script>
+    	<script language="javascript" type="text/javascript" src="{% static 'js/visualizar/app_visualizar.js' %} "></script>
+{% endblock script %}
+
+{% block content %}
+    {{ block.super }}
+
+<div class="py-5 bg-faded">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3">
+          <ul class="">
+            <a class="btn btn-info" href= "{% url  'visualizar:consVentasGeneral' %}" >Ventas General</a>
+          </ul>
+             <div class="form-group">
+                    <table class="table">
+                        <tbody>
+                          <tr>
+                            <td>Mejor Año:</td>
+                            <td>{{  configuracion_sql.server  }} </td>
+                          </tr>
+                          <tr>
+                            <td>Mejor Mes:</td>
+                            <td>{{  configuracion_sql.database  }} </td>
+                          </tr>
+                          <tr>
+                            <td>Promedio Anual:</td>
+                            <td>{{  configuracion_sql.database  }} </td>
+                          </tr>
+                          <tr>
+                            <td>Promedio Mensual:</td>
+                            <td>{{  configuracion_sql.database  }} </td>
+                          </tr>
+
+                    </table>
+             </div>
+
+        </div>
+        <div class="col-md-6" id="vxanio">
+
+        </div>
+        <div class="col-md-3" id="vxtrimestre">
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3">
+
+        </div>
+        <div class="col-md-9 "  >
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if ventasxanio %}
+    <script  type="text/javascript">
+     //este codigo necesariamente debe quedarse en el archivos HTML
+     //porque no se porsesa igual en una archivo .js
+     //para recoger los valores de las ariables
+
+        var datos = {{ventasxanio|safe}};
+        var datomes={{ ventasxmes|safe}};
+        //var datos = JSON.parse('[' + tmp + ']');
+
+        Graficar();
+    </script>
+{% endif  %}
+
+{% endblock content %}

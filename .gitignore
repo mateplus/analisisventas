@@ -1,0 +1,8 @@
+disenio/
+requirements/
+Lib/
+Scripts/
+Include/
+tcl/
+.idea/
+*.pyc

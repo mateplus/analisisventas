@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% block title %}
+  SAMI-ANALISIS
+{% endblock title %}
+
+{% block content %}
+    {{ block.super }}
+  <div class="py-5 bg-faded">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <form class="form-horizontal py-0 mx-auto" method="post">
+            {% csrf_token %}
+            <fieldset>
+              <!-- Form Name -->
+              <legend>Configuración</legend>
+              <!-- Text input-->
+              <div class="form-group">
+                  <label for="svrSami">Servidor Sami</label>
+
+                <div class="form-control">
+                    <input id="idsamiServer" name="samiServer" placeholder="Nombre servidor sql server" class="form-control input-md" required="" type="text" value="{{ configuracion.samiServer }}" >
+
+                    <span class="help-block">ejemplo: server\sqlexpress</span> </div>
+                <!-- Text input-->
+                <div class="form-group">
+                    <label for="SQLuser">Usuario SQL</label>
+                    <input id="SQLuser" name="usuarioSQL" placeholder="Nombre Usuario SQL" class="form-control input-md" type="text"  value="{{  configuracion.usuarioSQL }}"> </div>
+                <!-- Password input-->
+                <div class="form-group"> <label for="passwordinput">Pasword SQL</label>
+                    <input id="passwordinput" name="passSQL" placeholder="ingrese el password " class="form-control input-md" type="password" value="{{  configuracion.passSQL }}" >  </div>
+                <!-- Text input-->
+                <div class="form-group"> <label for="IDtrans">Transacciones</label>
+                  <div class="form-control"> <input id="IDtrans" name="Transacciones" placeholder="Transascciones de venta" class="form-control input-md" type="text" value="{{  configuracion.Transacciones }}"> <span class="help-block">Ejemplo: fc,ne,nv</span> </div>
+                </div>
+                <!-- Text input-->
+                <div class="form-group">
+                  <label for="baseDatosSQL">Base de datos</label>
+                      <input id="base" name="baseDatosSQL" placeholder="Base de datos" class="form-control input-md" type="text" value="{{  configuracion.baseDatosSQL }}" >
+                </div>
+                <!-- Button -->
+                <div class="form-group"> <button id="btnGuardar" name="btnGuardar" class="btn btn-primary text-warning">Guardar</button> </div>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
+	
