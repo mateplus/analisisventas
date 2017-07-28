@@ -59,6 +59,18 @@ function SeleccionaTrace(key){
                 d3.select(this).style("opacity",1);
             }
         });
+
+    svg.selectAll("circle")
+        .transition()
+        .duration(750)
+        .each(function(d,i){
+            if(d3.select(this).attr("data-legend")!= key){
+                d3.select(this).style("opacity",0.1);
+            }else{
+                d3.select(this).style("opacity",1);
+            }
+        }
+    );
 }
 
 //prepara los datos para graficar por trismestre
@@ -94,9 +106,6 @@ function ActualizaVentasTrimestrales(key,color){
     var VENTA_MAX =Math.max.apply(null, v);
    var _format = d3.format("$,.2f");
     //console.log( text.substr(0,text.length-1) );
-
-
-
     var datosT = JSON.parse(  "[" +  text.substr(0,text.length-1) + "]" );
 
     //cambiamos el eje del dominio de x
@@ -110,8 +119,6 @@ function ActualizaVentasTrimestrales(key,color){
         .transition()
         .duration(750)
         .call(ejeXtrim);
-
-
       svg.selectAll("rect")
       .data(datosT)
           .transition()
@@ -248,6 +255,7 @@ function VentasMensuales(){
 		.attr('class', 'tooltip')
 		.offset([-10, 0])
 		.html(function(d) {
+           console.debug(d);
 			return "<strong>" + d.Anio + "-" + d.Mes + "</strong><br> ventas: " + _format(+d.venta);
 		});
 
@@ -318,6 +326,15 @@ function VentasMensuales(){
 	//esta instruccion muestra los dadtos de una
 	//console.log(JSON.stringify(dataGroup));
 
+    //console.log(JSON.stringify(datomes));
+    //acontinuacion hacemos un doble egrupamiento por anio y por mes
+    datomes.sort(function(x,y){
+        return x.Anio - y.Anio || x.Mes - y.Mes;
+    })
+    //console.log(JSON.stringify(datomes));
+
+
+
 	dataGroup.forEach(function(d, i) {
 		svg.append('svg:path')
 			.attr('d', lineGen(d.values))
@@ -354,18 +371,21 @@ function VentasMensuales(){
 		 .attr("cy", function (d) {
 		   return y(hijo.venta);
 		 })
-		 .attr("r", 5)
-		 .on('mouseover', tooltip.show)
+		 .attr("r", 4)
+             .on('mouseover',  tooltip.show)
+//         .on('mouseover', function(d,i){
+//                 //console.log( d.Mes + d.venta);
+//                 tooltip.show;
+//             })
 		 .on('mouseout', tooltip.hide)
 		 .attr("fill", color(j))
+         .attr("data-legend", hijo.Anio);
 
 		})
    });
 
 	svg.selectAll(".mycircle")
      .data(datomes);
-    console.log(JSON.stringify(datomes));
-
     // now add titles to the axes
     svg.append("text")
         .attr("class","titulo-eje")
@@ -385,11 +405,10 @@ function VentasMensuales(){
         .attr("transform", "translate("+ (config.width/2) +"," + "-20" +")")  // centre below axis
         .text(config.tituloChart);
 
-
-
+    //esto es la leyenda
+    //que esta a la izquierda un cuadrado y el anio
 	 svg.selectAll(".legend")
          .data(dataGroup);
-
      dataGroup.forEach(function(d,i){
 
         svg.append("rect")
