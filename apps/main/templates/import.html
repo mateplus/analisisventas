@@ -108,8 +108,8 @@
                 <th>NumTrans</th>
                 <th style="display:none;">NumDocRef</th>
                 <th>Fecha</th>
-                <th>Vendedor</th>
-                <th>RUC</th>
+                <th style="display:none;">Vendedor</th>
+                <th style="display:none;">RUC</th>
                 <th>Nombre</th>
                 <th>Direccion</th>
                 <th>Telefono</th>
@@ -119,7 +119,10 @@
                 <th style="display:none;">CodGrupo1</th>
                 <th style="display:none;">CodGrupo2</th>
                 <th style="display:none;">CodGrupo3</th>
-                <th>Total</th>
+                <th>PTotal</th>
+                <th style="display:none;">CTotal</th>
+                <th style="display:none;">NumDiasMora</th>
+                <th >ItemsTotal</th>
                 <th>Descripcion</th>
               </tr>
             </thead>
@@ -132,8 +135,8 @@
                 <td>{{ dato.NumTrans }} </td>
                 <td style="display:none;">{{ dato.NumDocRef }} </td>
                 <td>{{ dato.FechaTrans|date:'d/m/Y' }} </td>
-                <td>{{ dato.Vendedor }} </td>
-                <td>{{ dato.RUC }} </td>
+                <td style="display:none;">{{ dato.Vendedor }} </td>
+                <td style="display:none;">{{ dato.RUC }} </td>
                 <td>{{ dato.Nombre }} </td>
                 <td>{{ dato.Direccion1 }} </td>
                 <td>{{ dato.Telefono1 }} </td>
@@ -143,7 +146,11 @@
                 <td style="display:none;">{{ dato.CodGrupo1 }} </td>
                 <td style="display:none;">{{ dato.CodGrupo2 }} </td>
                 <td style="display:none;">{{ dato.CodGrupo3 }} </td>
-                <td>{{ dato.Total|floatformat:2|intcomma }} </td>
+                <td>{{ dato.PTotal|floatformat:2|intcomma }} </td>
+                <td style="display:none;">{{ dato.CTotal|floatformat:2|intcomma }} </td>
+                <td style="display:none;">{{ dato.NumDiasMora|floatformat:2|intcomma }} </td>
+                <td >{{ dato.ItemsTotal|floatformat:2|intcomma }} </td>
+
                 <td></td>
 
                </tr>
@@ -187,7 +194,9 @@
                           'Pais':tab.rows[j].cells[9].innerHTML, 'Ciudad':tab.rows[j].cells[10].innerHTML,
                           'Provincia':tab.rows[j].cells[11].innerHTML,
                           'CodGrupo1':tab.rows[j].cells[12].innerHTML, 'CodGrupo2':tab.rows[j].cells[13].innerHTML,
-                          'CodGrupo3':tab.rows[j].cells[14].innerHTML, 'Total':tab.rows[j].cells[15].innerHTML
+                          'CodGrupo3':tab.rows[j].cells[14].innerHTML, 'PTotal':tab.rows[j].cells[15].innerHTML,
+                           'CTotal':tab.rows[j].cells[16].innerHTML,'NumDiasMora':tab.rows[j].cells[17].innerHTML,
+                           'ItemsTotal':tab.rows[j].cells[18].innerHTML
                    },
                    url: '/guardarMongo/',
                    type: 'GET',
@@ -195,20 +204,18 @@
                    error: function(data){
                        var obj=JSON.parse('[' + data + ']');
 //                       console.log(obj[0].msg)
-                       tab.rows[j].cells[16].innerHTML = obj[0].msg;
+                       tab.rows[j].cells[19].innerHTML = obj[0].msg;
                    },
                    success: function (data) {
                        var obj=JSON.parse('[' + data + ']');
 //                       console.log(obj[0].msg)
-                       tab.rows[j].cells[16].innerHTML = obj[0].msg;
+                       tab.rows[j].cells[19].innerHTML = obj[0].msg;
                    }
                });
            }
        }
 
     </script>
-
-
 {% endblock content %}
 
 

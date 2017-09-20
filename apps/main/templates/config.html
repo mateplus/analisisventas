@@ -6,63 +6,173 @@
 
 {% block content %}
     {{ block.super }}
-  <div class="py-5 bg-faded">
-    <div class="container">
-      <div class="row">
-        <form class="form-horizontal py-0 mx-auto" method="post">
-        <div class="col-md-9">
 
-            {% csrf_token %}
-            <fieldset>
-              <!-- Form Name -->
-              <legend>Configuración</legend>
-              <!-- Text input-->
-              <div class="form-group">
-                  <label for="svrSami">Servidor Sami</label>
+  <div class="container">
+      <form class="form-horizontal py-0 mx-auto" method="post">
+          <div class="py-5 bg-faded">
+              <div class="row">
+                 <div class="col-md-9">
 
-                <div class="form-control">
-                    <input id="idsamiServer" name="samiServer" placeholder="Nombre servidor sql server" class="form-control input-md" required="" type="text" value="{{ configuracion.samiServer }}" >
+                {% csrf_token %}
+                <fieldset>
+                  <!-- Form Name -->
+                  <legend>Configuración para importación de datos</legend>
+                  <!-- Text input-->
+                  <div class="form-group">
+                      <label for="svrSami">Servidor Sami</label>
+                     <div class="form-control">
+                         <input id="idsamiServer" name="samiServer" placeholder="Nombre servidor sql server" class="form-control input-md" required="" type="text" value="{{ configuracion.samiServer }}" >
+                        <span class="help-block">ejemplo: server\sqlexpress,  o direccion ip 192.168.1.10 </span>
+                     </div>
 
-                    <span class="help-block">ejemplo: server\sqlexpress,  o direccion ip 192.168.1.10 </span> </div>
-                <!-- Text input-->
-                <div class="form-group">
-                    <label for="SQLuser">Usuario SQL</label>
-                    <input id="SQLuser" name="usuarioSQL" placeholder="Nombre Usuario SQL" class="form-control input-md" type="text"  value="{{  configuracion.usuarioSQL }}"> </div>
-                <!-- Password input-->
-                <div class="form-group"> <label for="passwordinput">Pasword SQL</label>
-                    <input id="passwordinput" name="passSQL" placeholder="ingrese el password " class="form-control input-md" type="password" value="{{  configuracion.passSQL }}" >  </div>
-                <!-- Text input-->
-                <div class="form-group"> <label for="IDtrans">Transacciones</label>
-                  <div class="form-control"> <input id="IDtrans" name="Transacciones" placeholder="Transascciones de venta" class="form-control input-md" type="text" value="{{  configuracion.Transacciones }}"> <span class="help-block">Ejemplo: fc,ne,nv</span> </div>
+
+                      <div class="row">
+                        <div class="col-md-6">
+                        <!-- usuario input-->
+                          <div class="form-group">
+                            <label for="SQLuser">Usuario SQL</label>
+                            <input id="SQLuser" name="usuarioSQL" placeholder="Nombre Usuario SQL" class="form-control input-md" type="text"  value="{{  configuracion.usuarioSQL }}">
+                          </div>
+
+                        </div>
+                        <div class="col-md-6">
+                        <!-- Password input-->
+                        <div class="form-group">
+                            <label for="passwordinput">Pasword SQL</label>
+                            <input id="passwordinput" name="passSQL" placeholder="ingrese el password " class="form-control input-md" type="password" value="{{  configuracion.passSQL }}" >
+                        </div>
+
+
+                        </div>
+                      </div>
+
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                              <label for="IDtrans">Transacciones</label>
+                              <div class="form-control">
+                                  <input id="IDtrans" name="Transacciones" placeholder="Transascciones de venta" class="form-control input-md" type="text" value="{{  configuracion.Transacciones }}"> <span class="help-block">Ejemplo: fc,ne,nv</span>
+                              </div>
+                          </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="IdentificadorTrans">Origen Num Trans</label>
+                              <div class="form-control">
+                                  <input id="IdentificadorTrans" name="IdentificadorTrans" placeholder="1 o 2" class="form-control input-md" type="text" value="{{  configuracion.IdentificadorTrans }}"> <span class="help-block">Ejemplo: Numtrans=1, NumDocRef=2</span>
+                              </div>
+                            </div>
+                        </div>
+                      </div>
+
+                    <!-- Text input-->
+                    <div class="form-group">
+                      <label for="baseDatosSQL">Base de datos</label>
+                          <input id="base" name="baseDatosSQL" placeholder="Base de datos" class="form-control input-md" type="text" value="{{  configuracion.baseDatosSQL }}" >
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+                 <div class="col-md-3">
+                   <p>Probar conexion a SQL server </p>
+                   {% csrf_token %}
+                   <button type="submit" id="btnTest" value="Test" name = "btnTest" class="btn btn-primary text-warning">Test</button>
+                   <p> Resultado de la consulta : {{ test.msg }} </p>
+                 </div>
+             </div>
+          </div>
+          <div class="row">
+            <legend>Configuración para predicción de ventas</legend>
+            <p>Pesos para calculo de Score de  Clientes</p>
+            <div class="form-group">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-control">
+                          <label for="PVenta">Peso venta</label>
+                          <input id="PVenta" name="PVenta" placeholder="0.6" class="form-control input-md" type="text" value="{{  configuracion.PVenta }}" >
+                      </div>
+
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-control">
+                          <label for="PRentabilidad">Peso Rentabilidad</label>
+                          <input id="PRentabilidad" name="PRentabilidad" placeholder="0.2" class="form-control input-md" type="text" value="{{  configuracion.PRentabilidad }}" >
+                      </div>
+
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-control">
+                          <label for="PMora">Peso Mora</label>
+                          <input id="PMora" name="PMora" placeholder="0.2" class="form-control input-md" type="text" value="{{  configuracion.PMora }}" >
+                      </div>
+                    </div>
+                  </div>
+                    <span class="help-block">ejemplo de los pesos: PVenta + PRentabilidad + PMora = 1</span>
                 </div>
+            <p>Rango de dias para valorar Mora de Clientes</p>
+            <div class="col-md-12">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Valor</th>
+                        <th>10</th>
+                        <th>9</th>
+                        <th>8</th>
+                        <th>7</th>
+                        <th>6</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Número Dias Mora</td>
+                        <td><input id="RMora10" name="RMora10" placeholder="0:5" class="form-control input-md" type="text" value="{{  configuracion.RMora10 }}" ></td>
+                        <td><input id="RMora9" name="RMora9" placeholder="6:10" class="form-control input-md" type="text" value="{{  configuracion.RMora9 }}" ></td>
+                        <td><input id="RMora8" name="RMora8" placeholder="11:15" class="form-control input-md" type="text" value="{{  configuracion.RMora8 }}" ></td>
+                        <td><input id="RMora7" name="RMora7" placeholder="16:20" class="form-control input-md" type="text" value="{{  configuracion.RMora7 }}" ></td>
+                        <td><input id="RMora6" name="RMora6" placeholder="21:25" class="form-control input-md" type="text" value="{{  configuracion.RMora6 }}" ></td>
+                      </tr>
+                    </tbody>
+                  </table>
 
-                <div class="form-group"> <label for="IdentificadorTrans">Origen Num Trans</label>
-                  <div class="form-control"> <input id="IdentificadorTrans" name="IdentificadorTrans" placeholder="1 o 2" class="form-control input-md" type="text" value="{{  configuracion.IdentificadorTrans }}"> <span class="help-block">Ejemplo: Numtrans=1, NumDocRef=2</span> </div>
-                </div>
+                <div class="col-md-12">
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Valor</th>
+                        <th>5</th>
+                        <th>4</th>
+                        <th>3</th>
+                        <th>2</th>
+                        <th>1</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Número Dias Mora</td>
+                        <td><input id="RMora5" name="RMora5" placeholder="25:30" class="form-control input-md" type="text" value="{{  configuracion.RMora5 }}" ></td>
+                        <td><input id="RMora4" name="RMora4" placeholder="31:40" class="form-control input-md" type="text" value="{{  configuracion.RMora4 }}" ></td>
+                        <td><input id="RMora3" name="RMora3" placeholder="41:60" class="form-control input-md" type="text" value="{{  configuracion.RMora3 }}" ></td>
+                        <td><input id="RMora2" name="RMora2" placeholder="61:90" class="form-control input-md" type="text" value="{{  configuracion.RMora2 }}" ></td>
+                        <td><input id="RMora1" name="RMora1" placeholder="91:1000" class="form-control input-md" type="text" value="{{  configuracion.RMora1 }}" ></td>
+                      </tr>
+                    </tbody>
+                  </table>
 
-                <!-- Text input-->
-                <div class="form-group">
-                  <label for="baseDatosSQL">Base de datos</label>
-                      <input id="base" name="baseDatosSQL" placeholder="Base de datos" class="form-control input-md" type="text" value="{{  configuracion.baseDatosSQL }}" >
+
+
                 </div>
                 <!-- Button -->
                 <div class="form-group">
                     <button type="submit" id="btnGuardar" value = "Guardar" name="btnGuardar" class="btn btn-primary text-warning">Guardar</button>
                 </div>
-              </div>
-            </fieldset>
+
+
 
         </div>
-          <div class="col-md-3">
-            <p>Probar conexion a SQL server </p>
-            {% csrf_token %}
-            <button type="submit" id="btnTest" value="Test" name = "btnTest" class="btn btn-primary text-warning">Test</button>
-            <p> Resultado de la consulta : {{ test.msg }} </p>
-         </div>
-
-        </form>
       </div>
-    </div>
+
+      </form>
   </div>
 {% endblock content %}
 	

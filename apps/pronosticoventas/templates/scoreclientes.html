@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% block title %}
+  Aprendizaje Automatico
+{% endblock title %}
+
+{% block styles %}
+
+{% endblock styles %}
+
+
+
+{% block script %}
+
+{% endblock script %}
+
+{% block content %}
+    {{ block.super }}
+   <div class="container ">
+
+
+       <ul class="nav nav-tabs">
+                <li class="nav-item">
+                  <a href="{% url 'pronosticoventas:scoreclientes' %}" class="active nav-link"><i class="fa fa-users fa-2x"></i>&nbsp;SCORE CLIENTE</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'pronosticoventas:rnatrain' %}"><i class="fa fa-2x fa-lightbulb-o"></i>ENTRENAMIENTO MODELO</a>
+                </li>
+       </ul>
+
+      <div class="row">
+        <div class="col-md-8">
+           <legend>SCORE CLIENTE</legend>
+            <p>Se pretende, calcular una puntuacion (SCORE) por cada cliente. Donde el valor de 10 indica que es un cliente excelente, y 0 es un mal cliente
+               para lograr esto es evalua los siguientes aspectos: </p>
+            <li>Ventas: El valor total en dinero que el cliente ha adquirido a la empresa, en el periodo definido </li>
+            <li>Rentabilidad: El valor total de utilidadque representan las ventas del cliente, en el periodo definido</li>
+            <li>Mora: Es el numero de dias que han pasado, desde la fecha de vencimiento hasta que el cliente ha realizado el pago, en el periodo definido</li>
+
+        </div>
+        <div class="col-md-4">
+            <p>Los pesos que se han definido para cada variable son:</p>
+              <table class="table">
+                    <tbody>
+                      <tr>
+                        <td>Peso Ventas:</td>
+                        <td>{{  configuracion.PesoV  }} </td>
+                      </tr>
+                      <tr>
+                        <td>Peso Rentabilidad:</td>
+                        <td>{{  configuracion.PesoR  }} </td>
+                      </tr>
+                      <tr>
+                        <td>Peso Mora:</td>
+                        <td>{{  configuracion.PesoM  }} </td>
+                      </tr>
+
+                    </tbody>
+              </table>
+        </div>
+      </div>
+     <div class="row">
+          <form class="form-inline text-warning"  action="/score_cliente/" method="get" >
+            {% csrf_token %}
+              <div class="form-group"> <label for="fdesde">Fecha Desde:</label>
+                  <input type="date" id="fdesde" name="fdesde" placeholder="01/01/2010" class="form-control input-md"  value={{  condicion.fdesde }}>
+              </div>
+              <div class="form-group"> <label for="fhasta">Fecha Hasta:</label>
+                  <input type ="date" id="fhasta" name="fhasta" placeholder="12/31/2017" class="form-control input-md" value={{ condicion.fhasta }}  >
+              </div>
+              <button type="submit" class="btn btn-primary text-warning">Buscar</button>
+
+               {% if errors  %}
+                    <ul>
+                        <p>ERRORES:</P>
+                        {% for error in errors %}
+                            <li style="color:red;">{{ error }}</li>
+                        {% endfor %}
+                     </ul>
+                {% endif %}
+               <p> Resultado de la consulta : {{ condicion.numresultado }} registros  </p>
+          </form>
+
+        <div class="col-md-12">
+          <input type="button"  onclick="guardar()" value="Grabar Datos" class="btn btn-primary text-warning">
+          <table class="table" id="DataTableId">
+            <thead>
+              <tr>
+                <th>RUC</th>
+                <th>Nombre</th>
+                <th style="display:none;">Direccion</th>
+                <th style="display:none;">Telefono</th>
+                <th>Ventas USD</th>
+                <th>Ventas</th>
+                <th>Utilidad USD</th>
+                <th>Utilidad</th>
+                <th>Dias Mora</th>
+                <th>Mora</th>
+                <th>Puntaje Total</th>
+                <th style="display:none;">Ciudad</th>
+                <th>Promedio</th>
+                <th>Descripcion</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% load humanize %}
+             {%  for score in scoreclientes %}
+              <tr>
+
+
+                <td>{{ score.RUC }} </td>
+                <td>{{ score.Nombre }} </td>
+                <td style="display:none;">{{ score.Direccion }} </td>
+                <td style="display:none;">{{ score.Telefono }} </td>
+                <td align="right">{{ score.VentasVal|floatformat:2|intcomma }} </td>
+                <td align="right">{{ score.Ventas|floatformat:2|intcomma }} </td>
+                <td align="right">{{ score.UtilVal|floatformat:2|intcomma }} </td>
+                <td align="right">{{ score.Utilidad|floatformat:2|intcomma }} </td>
+                <td align="right">{{ score.DiasMora|floatformat:2|intcomma }} </td>
+                <td align="right">{{ score.Mora|floatformat:0|intcomma }} </td>
+                <td align="right">{{ score.Total|floatformat:0|intcomma }} </td>
+                <td style="display:none;">{{ score.Grupo }} </td>
+                <td>{{ score.Promedio }} </td>
+                <td></td>
+               </tr>
+             {% endfor %}
+            </tbody>
+          </table>
+
+		</div>
+      </div>
+   </div>
+
+
+    <!--Java Script para leer la tabla-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>-->
+
+    <script type="text/javascript"  src="{% static 'js/jquery.min.js' %} "></script>
+
+    <script>
+
+        $(document).ajaxStart(
+                function() {
+                    $(document.body).css({'cursor' : 'wait'});
+                        }).ajaxStop(function() {
+                $(document.body).css({'cursor' : 'default'});
+        });
+
+       function guardar(){
+           var tab = document.getElementById('DataTableId'); // id of table
+           var filas = tab.rows.length;
+           //console.log ('estoy en exportar')
+           //barrido de toda la tabla
+           //console.log('estamos en la subrutia exportar');
+
+           $.ajax({
+               url: '/eliminar/',
+               type: 'GET',
+               async: false,
+               error: function(data){},
+               success:function(data){
+
+               }
+           })
+
+            const COL_RUC= 0;
+            const COL_NOMBRE= 1;
+            const COL_DIRECCION= 2;
+            const COL_TELEFONO= 3;
+            const COL_SCORE= 10;
+            const COL_GRUPO= 11;
+            const COL_PROMEDIO= 12;
+            const COL_DESC= 13;
+           for (j = 1 ; j < filas; j++) {
+               //console.log ('CodTrans' + tab.rows[j].cells[0].innerHTML + 'NumTrans'+ tab.rows[j].cells[1].innerHTML);
+
+               $.ajax({
+                   data: {'RUC': tab.rows[j].cells[COL_RUC].innerHTML,
+                       'NombreCliente':tab.rows[j].cells[COL_NOMBRE].innerHTML,
+                       'Direccion':tab.rows[j].cells[COL_DIRECCION].innerHTML,
+                       'Telefono':tab.rows[j].cells[COL_TELEFONO].innerHTML,
+                       'ScoreClientes':tab.rows[j].cells[COL_SCORE].innerHTML,
+                       'Promedio':tab.rows[j].cells[COL_PROMEDIO].innerHTML,
+                       'Grupo':tab.rows[j].cells[COL_GRUPO].innerHTML
+
+                   },
+                   url: '/guardar/',
+                   type: 'GET',
+                   async: false,
+                   error: function(data){
+                       var obj=JSON.parse('[' + data + ']');
+//                       console.log(obj[0].msg)
+                       tab.rows[j].cells[COL_DESC].innerHTML = obj[0].msg;
+                   },
+                   success: function (data) {
+                       var obj=JSON.parse('[' + data + ']');
+//                       console.log(obj[0].msg)
+                       tab.rows[j].cells[COL_DESC].innerHTML = obj[0].msg;
+                   }
+               });
+           }
+       }
+    </script>
+
+{% endblock content %}

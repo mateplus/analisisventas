@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+{% block title %}
+  Aprendizaje Automatico
+{% endblock title %}
+
+{% block styles %}
+
+{% endblock styles %}
+
+
+
+{% block script %}
+
+{% endblock script %}
+
+{% block content %}
+    {{ block.super }}
+    <div class="container " xmlns="http://www.w3.org/1999/html">
+
+       <ul class="nav nav-tabs">
+                <li class="nav-item">
+                  <a href="{% url 'pronosticoventas:scoreclientes' %}" class="nav-link"><i class="fa fa-users fa-2x"></i>&nbsp;SCORE CLIENTE</a>
+                </li>
+                <li class="nav-item">
+                  <a class="active nav-link" href="{% url 'pronosticoventas:rnatrain' %}"><i class="fa fa-2x fa-lightbulb-o"></i>ENTRENAMIENTO MODELO</a>
+                </li>
+       </ul>
+        <div class="py-5 bg-faded">
+            <div class="row">
+                <div class="col-md-4">
+                <img class="img-fluid d-block mx-auto" src="{%  static 'img/RNA.png' %}" alt="RNA">
+                </div>
+                <div class="col-md-8">
+           <legend>Entrenamiento RNA</legend>
+            <p>Para lograr que el sistema pueda predecir las ventas se utiliza una RNA (Red neuronal Artifical), en esta seccion se
+               entrenara a la RNA para posteriormente, obtener las predicciones de ventas </p>
+
+        </div>
+            </div>
+      </div>
+
+         <form class="form-inline text-warning"  method="post" >
+             <div class="row">
+                <div class="col-md-4">
+                    {% csrf_token %}
+                      <button type="submit"  id="btnDataSet"  name="btnDataSet" class="btn btn-primary text-warning">GENERAR DATASET</button>
+
+                       {% if errors  %}
+                            <ul>
+                                <p>ERRORES:</P>
+                                {% for error in errors %}
+                                    <li style="color:red;">{{ error }}</li>
+                                {% endfor %}
+                             </ul>
+                        {% endif %}
+
+
+                </div>
+                <div class="col-md-8">
+                        <table class="table">
+                            <tbody>
+                              <tr>
+                              <td>Numero Clientes:</td>
+                                <td>{{ configuracion.numClientes }}</td>
+                              </tr>
+                              <tr>
+                              <td>Total de registros del dataset  :</td>
+                                <td>{{ configuracion.total }}</td>
+                              </tr>
+                              <tr>
+                              <td>Total de registros entrenamiento:</td>
+                                <td>{{ configuracion.totaltrain }}</td>
+                              </tr>
+                              <tr>
+                              <td>Total de registros prueba:</td>
+                                <td>{{ configuracion.totaltest }}</td>
+                              </tr>
+                            </tbody>
+                        </table>
+                 </div>
+            </div>
+             <div class="row">
+               <div class="col-md-4">
+                      <button type="submit" id="btnEntrenar"  name="btnEntrenar"  class="btn btn-primary text-warning">ENTRENAR MODELO</button>
+
+                       {% if errors  %}
+                            <ul>
+                                <p>ERRORES:</P>
+                                {% for error in errors %}
+                                    <li style="color:red;">{{ error }}</li>
+                                {% endfor %}
+                             </ul>
+                        {% endif %}
+               </div>
+               <div class="col-md-8">
+                        <table class="table">
+                            <tbody>
+                              <tr>
+                                <td>Coeficiente de Determinacion Lineal:</td>
+                                <td>{{ RNA.r_cuadrado }}</td>
+                              </tr>
+                            </tbody>
+                        </table>
+               </div>
+             </div>
+
+             <div class="row">
+               <div class="col-md-4">
+                      <button type="submit" id="btnEntrenarSVG"  name="btnEntrenarSVG"  class="btn btn-primary text-warning">ENTRENAR MODELO SVR</button>
+
+                       {% if errors  %}
+                            <ul>
+                                <p>ERRORES:</P>
+                                {% for error in errors %}
+                                    <li style="color:red;">{{ error }}</li>
+                                {% endfor %}
+                             </ul>
+                        {% endif %}
+               </div>
+               <div class="col-md-8">
+                        <table class="table">
+                            <tbody>
+                              <tr>
+                                <td>Coeficiente de Determinacion Lineal:</td>
+                                <td>{{ SVR.r_cuadrado }}</td>
+                              </tr>
+                            </tbody>
+                        </table>
+               </div>
+             </div>
+
+        </form>
+   </div>
+{% endblock content %}

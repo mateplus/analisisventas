@@ -27,7 +27,7 @@ class ConfigView(TemplateView):
     template_name='config.html'
     def post(self,request,*args,**kwargs):
      if 'btnGuardar' in request.POST:
-        print("presiono guardar")
+        #print("presiono guardar")
         try:
             obj=Configuracion.objects.get(0)
             obj.samiServer=  request.POST['samiServer']
@@ -36,6 +36,20 @@ class ConfigView(TemplateView):
             obj.Transacciones = request.POST['Transacciones']
             obj.baseDatosSQL = request.POST['baseDatosSQL']
             obj.IdentificadorTrans= request.POST['IdentificadorTrans']
+            #nuevo
+            obj.PVenta = request.POST['PVenta']
+            obj.PRentabilidad = request.POST['PRentabilidad']
+            obj.PMora = request.POST['PMora']
+            obj.RMora10 = request.POST['RMora10']
+            obj.RMora9 = request.POST['RMora9']
+            obj.RMora8 = request.POST['RMora8']
+            obj.RMora7 = request.POST['RMora7']
+            obj.RMora6 = request.POST['RMora6']
+            obj.RMora5 = request.POST['RMora5']
+            obj.RMora4 = request.POST['RMora4']
+            obj.RMora3 = request.POST['RMora3']
+            obj.RMora2 = request.POST['RMora2']
+            obj.RMora1 = request.POST['RMora1']
 
         except:
             obj=Configuracion(samiServer=request.POST['samiServer'],
@@ -44,21 +58,50 @@ class ConfigView(TemplateView):
                               Transacciones= request.POST['Transacciones'],
                               baseDatosSQL=request.POST['baseDatosSQL'],
                               IdentificadorTrans=request.POST['IdentificadorTrans'],
+                              PVenta=request.POST['PVenta'],
+                              PRentabilidad=request.POST['PRentabilidad'],
+                              PMora=request.POST['PMora'],
+                              RMora10=request.POST['RMora10'],
+                              RMora9=request.POST['RMora9'],
+                              RMora8=request.POST['RMora8'],
+                              RMora7=request.POST['RMora7'],
+                              RMora6=request.POST['RMora6'],
+                              RMora5=request.POST['RMora5'],
+                              RMora4=request.POST['RMora4'],
+                              RMora3=request.POST['RMora3'],
+                              RMora2=request.POST['RMora2'],
+                              RMora1=request.POST['RMora1'],
                               )
 
         obj.save()
         return HttpResponseRedirect(reverse( 'main:home', **kwargs))
      else:
+      #esto es en el caso de que hiso click en el boto de probar configuracion
       msg =  TestSQL(request)
      #context['respuesta']= {'msg': msg }
      context={}
-     #response= JsonResponse({'msg': msg })
+     #vamoa a redibujar
      context['configuracion'] = {"samiServer":request.POST['samiServer'],
                                  "usuarioSQL":request.POST['usuarioSQL'],
                                  "passSQL":request.POST['passSQL'],
                                  "Transacciones":request.POST['Transacciones'],
                                  "baseDatosSQL":request.POST['baseDatosSQL'],
-                                 "IdentificadorTrans":request.POST['IdentificadorTrans']}
+                                 "IdentificadorTrans":request.POST['IdentificadorTrans'],
+                                 "PVenta":request.POST['PVenta'],
+                                 "PRentabilidad":request.POST['PRentabilidad'],
+                                 "PMora":request.POST['PMora'],
+                                 "RMora10":request.POST['RMora10'],
+                                 "RMora9":request.POST['RMora9'],
+                                 "RMora8":request.POST['RMora8'],
+                                 "RMora7":request.POST['RMora7'],
+                                 "RMora6":request.POST['RMora6'],
+                                 "RMora5":request.POST['RMora5'],
+                                 "RMora4":request.POST['RMora4'],
+                                 "RMora3":request.POST['RMora3'],
+                                 "RMora2":request.POST['RMora2'],
+                                 "RMora1":request.POST['RMora1'],
+     }
+
      context['test']={'msg': msg }
      return render(request,'config.html', context)
 
@@ -165,8 +208,8 @@ def consSQL(request):
                                     #"numMongo": Ventas.objects.count, "maxDate": consFecha(request,1), "minDate": consFecha(request,0) }
         #print("primer try OK")
         if 'fdesde' in request.GET and 'fhasta' in request.GET :
-            fdesde=request.GET['fdesde']
-            fhasta=request.GET['fhasta']
+            fdesde=request.GET['fdesde'].strip()
+            fhasta=request.GET['fhasta'].strip()
             if not fdesde:
                 errors.append('fecha desde invalida')
             else:
@@ -176,17 +219,20 @@ def consSQL(request):
                     sql ="Select GNC.CodTrans, GNC.NumTrans,GNC.NumDocRef, GNC.FechaTrans, FCVendedor.CodVendedor as vendedor, \
                     PCProvCli.RUC, PCProvCli.Nombre,PCProvCli.Direccion1,PCProvCli.Telefono1, PCProvCli.Pais, \
                     PCProvCli.Ciudad,PCProvCli.Provincia,PCGrupo1.CodGrupo1, PCGrupo2.CodGrupo2 ,PCGrupo3.CodGrupo3, \
-                    sum( IVKArdex.PrecioRealTotal) *-1 as Total \
+                    sum( IVKArdex.PrecioRealTotal) *-1 as PTotal, sum( IVKArdex.CostoRealTotal) *-1 as CTotal,max(vwConsPCCobros.DiasMora) as NumDiasMora, \
+                    sum( IVKArdex.Cantidad) *-1 as ItemsTotal \
                     from GNComprobante GNC left join FCVendedor on GNC.IdVendedor = FCVendedor.IdVendedor \
                     inner join PCProvCli on GNC.IdClienteRef = PCProvCli.IdProvCli left join PCGrupo1 on Pcgrupo1.IdGrupo1 = PCProvCli.IdGrupo1 \
                     left join PCGrupo2 on Pcgrupo2.IdGrupo2 = PCProvCli.IdGrupo2 left join PCGrupo3 on  PCGrupo3.IdGrupo3 = PCProvCli.IdGrupo3 \
                     inner join IVKardex on GNC.TransID = IVKardex.TransID \
-                    where GNC.Estado <> 3 AND FechaTrans between  '" + fdesde + " \
-                    ' and  '" + fhasta + "' and  CodTrans = '" +  obj.Transacciones +  "' \
+                    left join vwConsPCCobros on GNC.TransID = vwConsPCCobros.TransID \
+                    where GNC.Estado <> 3 AND GNC.FechaTrans between  '" + fdesde + "' \
+                     and  '" + fhasta + "' and  GNC.CodTrans = '" +  obj.Transacciones +  "' \
                     group by GNC.codtrans, GNC.numtrans, GNC.NumDocRef, GNC.FechaTrans, FCVendedor.CodVendedor, \
                     PCProvCli.RUC, PCProvCli.Nombre,PCProvCli.Direccion1,PCProvCli.Telefono1, PCProvCli.Pais, \
                     PCProvCli.Ciudad,PCProvCli.Provincia,PCGrupo1.CodGrupo1, PCGrupo2.CodGrupo2 ,PCGrupo3.CodGrupo3"
-                    #print(sql) ok
+
+                    #print(sql) #ok
                     cursor.execute(sql)
                     context['datos'] = dictfetchall(cursor)
                     context['condicion']={'fdesde':fdesde,'fhasta': fhasta, 'numresultado':str(len(context['datos']))}
@@ -240,11 +286,29 @@ def guardarMongoAjax(request):
             if res:
                 response= JsonResponse({'msg': "La transaccion ya existe" })
             else:
+#                try:
+#                    numdias = int(request.GET['NumDiasMora'])
+#                    #numdias=request.GET['NumDiasMora']
+#                except ValueError:
+#                    numdias =0
+               # print("NUMDIAS")
+               # print(numdias)
+                numdias=0
+                if is_int (request.GET['NumDiasMora']):
+                    if request.GET['NumDiasMora'] < 0:
+                        numdias =0
+                    else:
+                        numdias=request.GET['NumDiasMora']
+                else:
+                    numdias =0
+
+
                 obj=Ventas.objects.create(CodTrans=request.GET['CodTrans'],
                           NumTrans= request.GET['NumTrans'],
                           NumDocRef= request.GET['NumDocRef'],
                           FechaTrans =   datetime.strptime(request.GET['FechaTrans'] +' 0:00' , '%d/%m/%Y  %H:%M'),
                           Vendedor =  request.GET['Vendedor'],
+                          RUCCliente=request.GET['RUC'].strip() ,
                           NombreCliente =  request.GET['Nombre'],
                           Direccion =  request.GET['Direccion'],
                           Telefono =  request.GET['Telefono'],
@@ -254,7 +318,10 @@ def guardarMongoAjax(request):
                           PCGrupo1 =  request.GET['CodGrupo1'],
                           PCGrupo2 =  request.GET['CodGrupo2'],
                           PCGrupo3 =  request.GET['CodGrupo3'],
-                          Total =  price_convert(request.GET['Total']),
+                          PTotal =  price_convert(request.GET['PTotal']),
+                          CTotal =  price_convert(request.GET['CTotal']),
+                          ItemsTotal =  price_convert(request.GET['ItemsTotal']),
+                          NumDiasMora =  numdias,
                           )
                 obj.save()
                 #print ("TODO OK")
@@ -272,4 +339,19 @@ def guardarMongoAjax(request):
 
 def price_convert(_price):
     import re
+    #print(_price)
     return float(re.sub(r'[^0-9.]', '', _price))
+
+def is_int(val):
+    if type(val) == int:
+        return True
+    else:
+        try:
+            if val.is_integer():
+                return True
+            else:
+                return False
+        except:
+            return  False
+
+

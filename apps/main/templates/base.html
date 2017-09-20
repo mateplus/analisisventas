@@ -11,6 +11,7 @@
 
   	<link rel="stylesheet" href="{% static 'css/font-awesome.min.css'%}">
 	<link rel="stylesheet" href="{% static 'css/sami9.css'%}">
+
 	<title>
 	{% block title %}
 	 
@@ -24,14 +25,18 @@
 <header>
     <div class="container">
       <div class="row">
-        <div class="col-md-4"> <img src="{%  static 'img/Sami9.png' %}" alt="SAMI 9"> </div>
-        <div class="col-md-8">
-          <ul class="nav nav-pills flex-column">
+        <div class="col-md-12">
+
+          <ul class="nav nav-pills">
+            <a class="navbar-brand" ><img src="{%  static 'img/Sami9.png' %}" alt="SAMI 9"></a>
+
+
             <li class="nav-item text-warning"> <a href="{% url 'main:home' %}" class="nav-link">Home</a> </li>
             <li class="nav-item"> <a href="{% url 'main:config' %}" class="nav-link">Configuracion</a> </li>
             <li class="nav-item"> <a href="{% url 'main:import' %}" class="nav-link">Importar Datos</a> </li>
-            <li class="nav-item"> <a href="#" class="nav-link">Entrenamiento</a> </li>
-            <li class="nav-item"> <a href="{% url 'visualizar:ventas' %}" class="nav-link">Visualizar</a> </li>
+            <li class="nav-item"> <a href="{% url 'pronosticoventas:scoreclientes' %}" class="nav-link">Aprendizaje Automatico</a> </li>
+            <li class="nav-item"> <a href="{% url 'pronosticoventas:reporte' %}" class="nav-link">Pronostico de Ventas</a> </li>
+            <li class="nav-item"> <a href="{% url 'visualizar:ventas' %}" class="nav-link">Dashboard</a> </li>
           </ul>
         </div>
       </div>

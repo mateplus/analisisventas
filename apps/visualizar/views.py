@@ -39,19 +39,19 @@ def consVentasGeneral(request):
     listaxmes=[]
     try:
         #consulta de ventas totales por anios
-        pipeline=[ {"$group":{ "_id":{"year": {"$year" : "$FechaTrans"}}, "Total":{"$sum":"$Total"}}}, {"$sort":{"_id.year":1}}]
+        pipeline=[ {"$group":{ "_id":{"year": {"$year" : "$FechaTrans"}}, "PTotal":{"$sum":"$PTotal"}}}, {"$sort":{"_id.year":1}}]
 
         #{$sort : {"_id.year":1,"_id.mes":1 }}
         VentasxAnio= Ventas.objects.aggregate(*pipeline )
         for doc in VentasxAnio:
             d=dict(doc["_id"])
-            lista.append( {'nombre':d['year'],'valor': doc["Total"] })
+            lista.append( {'nombre':d['year'],'valor': doc["PTotal"] })
 
         cadena=dumps(lista)
         context['ventasxanio'] =cadena
 
         #consulta de ventas x mes
-        pipeline=[ {"$group":{ "_id":{"year": {"$year" : "$FechaTrans"},"mes":{"$month":"$FechaTrans" } }, "Total":{"$sum":"$Total"}}}, {"$sort":{"_id.year":1,"_id.mes":1}}]
+        pipeline=[ {"$group":{ "_id":{"year": {"$year" : "$FechaTrans"},"mes":{"$month":"$FechaTrans" } }, "PTotal":{"$sum":"$PTotal"}}}, {"$sort":{"_id.year":1,"_id.mes":1}}]
 
         VentasxMes= Ventas.objects.aggregate(*pipeline )
 
@@ -65,7 +65,7 @@ def consVentasGeneral(request):
             d=dict(doc["_id"])
             #print(d['year'])
 
-            listaxmes.append( {'Anio':d['year'], 'Mes': calendar.month_abbr[ d['mes']],'venta': doc["Total"],
+            listaxmes.append( {'Anio':d['year'], 'Mes': calendar.month_abbr[ d['mes']],'venta': doc["PTotal"],
                                'trimestre': ValTrim( d['mes']) })
 
 

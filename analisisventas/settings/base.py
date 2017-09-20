@@ -19,6 +19,7 @@ THIRD_PARTY_APPS = (
 LOCAL_APPS = (
 	'apps.main',
     'apps.visualizar',
+    'apps.pronosticoventas',
 )
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

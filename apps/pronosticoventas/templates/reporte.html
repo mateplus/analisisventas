@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+
+{% block title %}
+  Importar Datos
+{% endblock title %}
+
+{% block script %}
+    <script type="text/javascript"  src="{% static 'js/jquery.min.js' %} "></script>
+{% endblock script  %}
+
+{% block content %}
+    {{ block.super }}
+  <div class="container ">
+        <div class="py-5 bg-faded">
+          <div class="row">
+             <div class="col-md-4">
+                <img class="img-responsive imageClip"  src="{%  static 'img/reporte.png' %}" alt="Reporte">
+             </div>
+             <div class="col-md-8">
+                <legend>REPORTE DE VENTAS MENSUALES</legend>
+                <p>En el presente reporte, se visualiza el total de ventas por cada mes, existen dos columnas principales,
+                    que es la venta real y la venta pronosticada. </p>
+
+                  <form class="form-inline text-warning"  action="/consReporte/" method="get" >
+                    {% csrf_token %}
+                      <div class="form-group">
+                        <label for="anio">Año</label>
+                        <input name="anio" value="{{ reporte.anio }}" disabled>
+                        <label for="mes">Mes</label>
+                          <select name="mes" id="mes">
+                              {%  for mes in meses %}
+                                <option value="{{  forloop.counter }}"  {% if forloop.counter == reporte.mes %}selected {% endif %} >
+                                  {{ mes }}
+                                </option>
+                              {% endfor %}
+
+                          </select>
+                      </div>
+
+                      <button type="submit" class="btn btn-primary text-warning">Buscar</button>
+                      <p> Resultado de la consulta : {{ reporte.numresultado }} registros  </p>
+
+                      <button class="btn btn-primary text-warning" id="btnExport" onclick="fnExcelReport();"> EXPORTAR A EXCEL </button>
+
+                  </form>
+
+                    {% if errors  %}
+                        <ul>
+                            {% for error in errors %}
+                                <li style="color:red;">{{ error }}</li>
+                            {% endfor %}
+                         </ul>
+                    {% endif %}
+
+
+
+             </div>
+          </div>
+        </div>
+  </div>
+  <div class="py-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <table class="table" id="DataTableId">
+            <thead>
+              <tr>
+                <th>RUC</th>
+                <th>Nombre</th>
+                <th>Direccion</th>
+                <th>Telefono</th>
+                <th>Score</th>
+                <th>VentaHist</th>
+                <th>VentaReal</th>
+                <th>VentaEsperada</th>
+                <th>Diferencia</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% load humanize %}
+             {%  for dato in datos %}
+              <tr>
+               {% if dato.Diferencia < 500 %}
+                    <td>{{ dato.RUC}} </td>
+                    <td>{{ dato.Nombre}} </td>
+                    <td>{{ dato.Direccion1 }} </td>
+                    <td>{{ dato.Telefono1 }} </td>
+                    <td>{{ dato.Score }} </td>
+                    <td align="right">{{ dato.Vhist|floatformat:2|intcomma }} </td>
+                    <td align="right">{{ dato.Vreal|floatformat:2|intcomma  }} </td>
+                    <td align="right">{{ dato.Vcalculada|floatformat:2|intcomma  }} </td>
+                    <td align="right">{{ dato.Diferencia|floatformat:2|intcomma  }} </td>
+              {% else %}
+
+                    <td class="alert-danger">{{ dato.RUC}} </td>
+                    <td class="alert-danger">{{ dato.Nombre}} </td>
+                    <td class="alert-danger">{{ dato.Direccion1 }} </td>
+                    <td class="alert-danger">{{ dato.Telefono1 }} </td>
+                    <td class="alert-danger">{{ dato.Score }} </td>
+                    <td class="alert-danger" align="right">{{ dato.Vhist|floatformat:2|intcomma }} </td>
+                    <td class="alert-danger" align="right">{{ dato.Vreal|floatformat:2|intcomma }} </td>
+                    <td class="alert-danger" align="right">{{ dato.Vcalculada|floatformat:2|intcomma }} </td>
+                    <td class="alert-danger" align="right">{{ dato.Diferencia|floatformat:2|intcomma }} </td>
+
+              {% endif %}
+               </tr>
+             {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<script type="text/javascript"  src="{% static 'js/jquery.min.js' %} "></script>
+
+<script>
+    function fnExcelReport()
+    {
+        var tab_text="<table border='2px'><tr bgcolor='#87AFC6'>";
+        var textRange; var j=0;
+        tab = document.getElementById('DataTableId'); // id of table
+
+        for(j = 0 ; j < tab.rows.length ; j++)
+        {
+            tab_text=tab_text+tab.rows[j].innerHTML+"</tr>";
+            //tab_text=tab_text+"</tr>";
+        }
+
+        tab_text=tab_text+"</table>";
+        tab_text= tab_text.replace(/<A[^>]*>|<\/A>/g, "");//remove if u want links in your table
+        tab_text= tab_text.replace(/<img[^>]*>/gi,""); // remove if u want images in your table
+        tab_text= tab_text.replace(/<input[^>]*>|<\/input>/gi, ""); // reomves input params
+
+        var ua = window.navigator.userAgent;
+        var msie = ua.indexOf("MSIE ");
+
+        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
+        {
+            txtArea1.document.open("txt/html","replace");
+            txtArea1.document.write(tab_text);
+            txtArea1.document.close();
+            txtArea1.focus();
+            sa=txtArea1.document.execCommand("SaveAs",true,"Say Thanks to Sumit.xls");
+        }
+        else                 //other browser not tested on IE 11
+            sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));
+
+        return (sa);
+    }
+</script>
+
+
+{% endblock content %}

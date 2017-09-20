@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 urlpatterns = [
 	url(r'^',include('apps.main.urls', namespace="main")),
     url(r'^',include('apps.visualizar.urls', namespace="visualizar")),
+    url(r'^',include('apps.pronosticoventas.urls', namespace="pronosticoventas")),
     url(r'^admin/', admin.site.urls),
 ]  + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
